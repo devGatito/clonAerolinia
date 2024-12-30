@@ -1,0 +1,65 @@
+let mybuttonmenu=document.querySelector('#idIconMenu');
+     mybuttonmenu.addEventListener('click',()=>{
+    let mostrarmenumobile=document.querySelector('#idMenuMobile');
+    mostrarmenumobile.classList.toggle('hide-xs');
+});
+
+let mybuttonmenuclose=document.querySelector('#idCloseMenu');
+     mybuttonmenuclose.addEventListener('click',()=>{
+    let mostrarmenumobile=document.querySelector('#idMenuMobile');
+    mostrarmenumobile.classList.toggle('hide-xs');
+});
+
+/*Abrir listado de telefonos*/
+let mybuttonmenuopenmb=document.querySelector('#idClickPhone');
+    mybuttonmenuopenmb.addEventListener('click',()=>{
+    let mostrarmenumobile2=document.querySelector('#idContainerPhone');
+    mostrarmenumobile2.classList.toggle('d-none');
+});
+
+/*cerrrarlistado de telefonos*/
+let mybuttonmenucerrarmb=document.querySelector('#idContainerPhoneclose');
+    mybuttonmenucerrarmb.addEventListener('click',()=>{
+    let mostrarmenumobile3=document.querySelector('#idContainerPhone');
+        mostrarmenumobile3.classList.toggle('d-none');
+});
+
+
+
+ 
+let mybuttonlogin=document.querySelector('.mybuttonlogin');
+mybuttonlogin.addEventListener('click',()=>{
+    let mostrar=document.querySelector('#no_login_content');
+    mostrar.classList.toggle('show');
+});
+
+
+
+let listElements=document.querySelectorAll('.tabs-header');
+listElements.forEach(listElement => {
+
+  listElement.addEventListener('click',()=>{
+   let hijo=listElement.querySelector('.ch-dropdown');
+   if (hijo) {
+       hijo.classList.toggle('d-none');
+   }
+  });
+
+  listElement.addEventListener('mouseout',()=>{
+   let hijo=listElement.querySelector('.ch-dropdown');
+   if (hijo) {
+       hijo.classList.add('d-none');
+       
+   }
+  });
+
+  listElement.addEventListener('mouseover',()=>{
+   let hijo=listElement.querySelector('.ch-dropdown');
+   if (hijo) {
+       hijo.classList.remove('d-none');
+
+   }
+  });
+
+
+});

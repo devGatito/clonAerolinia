@@ -1,0 +1,185 @@
+if (window.post_id) {
+  var script = document.createElement("script");
+  var url = window.site_url +
+    "/wp-json/go1mx/v1/hoteles/" +
+    window.post_id +
+    "?CampaignToken=" +
+    window.campaignToken;
+
+  $(function () {
+    $.get(url, function (data) {
+      //console.log(data);
+      generarHoteles(data);
+    }, "json");
+  });
+
+
+  /*script.src =
+    window.site_url +
+    "/wp-json/go1mx/v1/hoteles/" +
+    window.post_id +
+    "?_jsonp=generarHoteles&CampaignToken=" +
+    window.campaignToken;
+  document.getElementById("hoteles_container_script").appendChild(script);*/
+
+  function getPrice(price) {
+    return "$" + Math.round(price).toLocaleString("en-CO");
+  }
+  function truncateString(string, limit) {
+    if (string.length > limit) {
+      return string.substring(0, limit);
+    } else {
+      return string;
+    }
+  }
+  function getEstrellas(num) {
+    var html = "";
+
+    for (let i = 0; i < num; i++) {
+      html +=
+        '<span class="wmk-star"><img src="' + window.site_url + '/wp-content/uploads/2022/08/star.svg"></img></span>';
+    }
+    if (num % 1 == 0.5) {
+      // html +='<span class="wmk-star"><img src="'+window.site_url+'/wp-content/uploads/2022/08/star.svg"><span>';
+    }
+    return html;
+  }
+  function getFechaSimple(fecha) {
+    var fecha = new Date(fecha + "T00:00");
+    var options = { month: "long", day: "numeric" };
+    return capitalizeFirstLetter(fecha.toLocaleDateString("es-CO", options));
+  }
+
+  function ordenarIds(post) {
+    //orden manual
+    if (post.orden == 0) {
+      var ordenados = [];
+      for (let id of post.ids) {
+        if (post.hoteles.tax["h" + id]) {
+          ordenados.push(id);
+        }
+      }
+      return ordenados;
+      //menor precio
+    } else if (post.orden == 1) {
+      var items = [];
+      for (let id in post.hoteles.tax) {
+        items.push({ id, value: post.hoteles.tax[id] });
+      }
+      var ordenados = items.sort((a, b) => a.value - b.value);
+      var ids = [];
+      for (let item of ordenados) {
+        ids.push(item.id.substring(1));
+      }
+      return ids;
+    }
+  }
+
+  function generarHoteles(post) {
+    window.defineLocaleXD();
+    window.booker = Booker("place_name_hotel", post.fechas.inicio, post.fechas.fin);
+    window.post = post;
+    window.totalHoteles = 0;
+    window.countHoteles = 0;
+    let hoteles = ordenarIds(post);
+    for (let id of hoteles) {
+      let script = document.createElement("script");
+      script.src =
+        window.site_url +
+        "/wp-json/go1mx/v1/hotel/" +
+        id +
+        "?_jsonp=renderHotel";
+        //console.log("" + script.src);
+      document.getElementById("hoteles_container_script").appendChild(script);
+      window.totalHoteles++;
+
+
+      let hotelDiv = document.createElement("div");
+      hotelDiv.className = "col-md-4";
+      hotelDiv.id = "h" + id;
+      document.getElementById("hoteles_container").appendChild(hotelDiv);
+
+    }
+    if (window.totalHoteles == 0) {
+      document.getElementById("hoteles_container").className = "row";
+      document.getElementById("lbl_precio").innerText = "Sin disponibilidad";
+    } else {
+      var minimo = Object.values(post.hoteles.rates).sort((a, b) => a - b)[0];
+      document.getElementById("lbl_precio").innerText = getPrice(minimo);
+    }
+    document.getElementById("lbl_inicio").innerText =
+      "Del " + getFechaSimple(window.post.fechas.inicio);
+    document.getElementById("lbl_fin").innerText =
+      "al " + getFechaSimple(window.post.fechas.fin);
+  }
+
+  function capitalizeFirstLetter(str) {
+    // converting first letter to uppercase
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  function getFecha(fecha) {
+    var fecha = new Date(fecha + "T00:00");
+    var options = { weekday: "long", month: "long", day: "numeric" };
+    return capitalizeFirstLetter(fecha.toLocaleDateString("es-CO", options));
+  }
+
+  function renderHotel(hotel) {
+    try {
+      //console.log(hotel);
+      var info = window.post.hoteles.tax["h" + hotel.hotelID];
+      //console.log(info);
+      var template = document.getElementById("hotel_template").cloneNode(true);
+      template.removeAttribute("id");
+      var url =
+        "https://www.tiquetesbaratos.com/hotel/" +
+        hotel.uri +
+        "?adults=2&checkin=" +
+        window.post.fechas.inicio +
+        "&checkout=" +
+        window.post.fechas.fin;
+      if (window.campaignToken) {
+        url += "&CampaignToken="; + window.campaignToken;
+      }
+      template.getElementsByClassName("link_url")[0].href = url;
+
+      template.getElementsByClassName("wmk-cb-hotel-name")[0].innerText =
+        truncateString(hotel.name, 40);
+      template.getElementsByClassName("wmk-cb-destino")[0].innerText =
+        hotel.location.city;
+      template.getElementsByClassName("img-bg")[0].src =
+        hotel.gallery[0].cloudUri;
+      template.getElementsByClassName("wmk-item-info-promo")[0].innerText =
+        getPrice(info.totalRoomRatePerNight);
+      template.getElementsByClassName("fecha-inicio")[0].innerText = getFecha(
+        window.post.fechas.inicio
+      );
+      template.getElementsByClassName("fecha-fin")[0].innerText = getFecha(
+        window.post.fechas.fin
+      );
+      template.getElementsByClassName("wmk-stars-hotel")[0].innerHTML =
+        getEstrellas(hotel.stars);
+
+      if (info.discount < 1) {
+        template.getElementsByClassName("vmk-ribbon")[0].style.display = "none";
+        template.getElementsByClassName("wmk-item-info-precio")[0].style.opacity =
+          "0";
+      } else {
+        template.getElementsByClassName("wmk-item-info-precio")[0].innerText =
+          getPrice(info.totalRoomRateBeforePromoPerNight);
+        template.getElementsByClassName("vmk-discount")[0].innerText =
+          "-" + Math.round(info.discount) + "%";
+      }
+
+      document.getElementById("h" + hotel.hotelID).appendChild(template);
+    } catch (error) {
+      let elemento = document.getElementById("h" + hotel.hotelID);
+      elemento.parentNode.removeChild(elemento);
+    }
+    window.countHoteles++;
+
+    if (window.totalHoteles == window.countHoteles) {
+      document.getElementById("hoteles_container").className = "row";
+    }
+  }
+}

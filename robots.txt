@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /hotel/*?*
+Disallow: */hotel-detalle?*
+Disallow: /vuelos/checkout
+Disallow: /hotel/checkout
+Sitemap: https://www.tiquetesbaratos.com/front-hoteles/sitemaps/sitemap-index.xml

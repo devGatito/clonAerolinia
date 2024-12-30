@@ -1,0 +1,293 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>
+        
+Cómo hacer modificaciones en tu reservación
+
+    </title>
+    
+    <meta content="Reserva hoteles, paquetes, tours, boletos de avión para las principales playas y ciudades de México, República Dominicana, Estados Unidos y El Caribe. Información de hoteles, paquetes hotel más avión, tours, en playas y ciudades de México"
+      name="description" />
+
+    
+    <meta name="ROBOTS" content="NOINDEX, NOFOLLOW" />
+    
+    <link rel="SHORTCUT ICON" href="https://b2b2c.cdnpt.com/tiquetes-baratos/images/favicon.ico" />
+    <link href='https://b2b2c.cdnpt.com/general/css/master.css?v=1' rel='stylesheet' type='text/css' />
+    <link href='https://b2b2c.cdnpt.com/general/css/general.css?v=1' rel='stylesheet' type='text/css' />
+    <link href='https://b2b2c.cdnpt.com/general/css/responsive-flow.css?v=1' rel='stylesheet' type='text/css' />
+    <link href='https://cdnpt.com/cssshared/bootstrap.css?v=1' rel='stylesheet' type='text/css' />
+    <script type='text/javascript' src='https://viajes.tiquetesbaratos.com/ayuda/js/globals.js?v=100' ></script>
+    
+   <link href='https://cdnpt.com/cssShared/itinerary.css?v=1' rel='stylesheet' type='text/css' />
+   <link href='https://b2b2c.cdnpt.com/general/css/itinerario2.css?v=1' rel='stylesheet' type='text/css' />
+   
+    
+    <!--[if IE]>
+      <link href='https://b2b2c.cdnpt.com/general/css/ie.css?v=1' rel='stylesheet' type='text/css' />
+   <![endif]-->
+    
+    <link rel="stylesheet" type="text/css" href="https://b2b2c.cdnpt.com/tiquetes-baratos/css/custom.css" />
+
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+</head>
+<body class="help-page">
+    
+<script type="text/javascript">
+   function hideSplash()
+   {
+      document.getElementById('splash').style.display = 'none';
+      document.getElementById('splashContent').style.display = '';
+   }
+   
+   function showSplash()
+   {
+      document.getElementById('splash').style.display='';
+      document.getElementById('splashContent').style.display='none';
+      setInterval("showDotsSplash()", 70);
+   }
+</script>
+
+<center>
+   <div id="splash" style="color: #3366AA; left: 0px; width: 100%; display:none" >
+      <img style="margin: 0 0 70px 0;" src="https://b2b2c.cdnpt.com/general/images/L5/logosplash.gif" alt="Tiquetes Baratos" />
+      <h1>
+         Estamos procesando su solicitud
+         <span id="dotsSplash" style="position: absolute; display:"></span>
+      </h1>
+      
+      <img id="aniSpl" style="display:none" src="https://b2b2c.cdnpt.com/general/images/splashv4.gif" alt="..." />
+      <script type="text/javascript">
+         var iDot = 1
+         
+         function showDotsSplash()
+         {
+            if (iDot>7)
+            {
+               iDot = 0;
+               document.getElementById('dotsSplash').innerHTML = "";
+            }
+            
+            document.getElementById('dotsSplash').innerHTML = document.getElementById('dotsSplash').innerHTML + ".";
+            iDot+=1;
+         }
+      </script>
+      <h2>
+         
+      </h2>
+      <h4 class="higLit">
+         Llámenos sin costo desde México</h4>
+   </div>
+</center>
+
+
+    <div id="splashContent">
+        <div id="divRoomQuoted" style="position: absolute; display: none; left: 526px; z-index: 2;" onmouseout="javascript:hidePopup();"></div>
+        <div id="container2">
+                <header id="header">
+        <div class="container-xxl d-flex justify-content-between align-items-center p-3">
+
+            <a class="tb-header-logo-top" href="https://viajes.tiquetesbaratos.com/" title="/">
+                <img src="https://s3.amazonaws.com/prod-single-spa.pricetravel.com.mx/assets/1.0.218/img/logo-tiquetesbaratos.png"
+                    height="44px">
+            </a>
+        </div>
+    </header>
+            <div id="Content">
+                
+	
+                
+
+ 
+   <div id="helpleft">
+      <div class="hotsidbar">
+         <ul>
+            <li>
+               <a  href="https://viajes.tiquetesbaratos.com/ayuda/tiquetes-baratos/reservacion" title="Consultar reservación">
+                  Itinerario
+               </a>
+            </li>
+             
+            <li>
+               <a  id="lnkInvoicing" href="https://viajes.tiquetesbaratos.com/ayuda/tiquetes-baratos/facturacion" title="Modificar reservación">
+                  Facturación
+               </a>
+            </li>
+            
+            <li>
+               <a class="active" id="lnkChangeReservation" href="modificar-reservacion.html" 
+                   title="Modificar reservación">
+                  Modificaciones
+               </a>
+            </li>
+            
+            <li>
+               <a  id="lnkCancelReservation" href="cancelar-reservacion.html"   title="Cancelar reservación" >
+                  Cancelaciones
+               </a>
+            </li>
+            
+                     <li style="margin: 10px 0 0 0;">                            
+                        <a class="imptt" href="https://viajes.tiquetesbaratos.com/ayuda/tiquetes-baratos" title="Regresar a Ayuda">Regresar a Ayuda </a>
+                     </li>
+            
+         </ul>
+      </div> 
+   </div>
+
+
+
+
+<script>
+   function togglePaymentReceiptsVisibility() {
+      var reservationStatusLink = document.querySelector('a[title="Consultar reservación"]');
+      var paymentReceiptsLink = document.getElementById("paymentReceiptsLink");
+      if (reservationStatusLink && paymentReceiptsLink) {
+         if (reservationStatusLink.classList.contains("active")) {
+            paymentReceiptsLink.style.display = "block";
+         } else {
+            paymentReceiptsLink.style.display = "none";
+         }
+      }
+   }
+  togglePaymentReceiptsVisibility();
+</script>    
+    <div id="main">
+
+        <h1>Cómo hacer modificaciones en tu reservación</h1>
+
+
+<div class="well group">
+   <div class="fl">
+   <dl>
+      
+        <dt>Para modificar llamar al:</dt>
+      
+      <dd>(601) 74366 20<br/> y tener a la mano estos datos&nbsp;<span class="big">&rarr;</span></dd>
+      <dt>Horario de atención:</dt>
+            <dd>Las 24 horas, los 365 días del año</dd>
+    </dl>
+   </div>
+   <div class="fl">
+      <ol>
+         <li><span>Nombre completo de la persona que viaja</span></li>
+         <li><span>Localizador</span></li>
+         <li><span>Clave de confirmación (si ya la recibiste)</span></li>
+      </ol>
+   </div>
+</div>
+<div class="clear"></div>
+
+         
+         <h2>Reglas que aplican para modificaciones de todos los servicios</h2>
+         
+        <ul>
+            <li>Todas las modificaciones están sujetas a disponibilidad.
+            </li>
+            <li>Todas las modificaciones están sujetas al pago completo de los cargos extra que pudieran producirse de acuerdo al cambio solicitado y la fecha de la solicitud.
+                </li>
+         </ul>
+        
+         <hr />
+         
+         <h3>Modificaciones en reservaciones de hotel</h3>
+         <ul>
+                <li>Aplican penalidades si cambias de hotel, de acuerdo al día en que hagas la solicitud.</li>
+                <li>Si disminuyes los días de tu estancia te reembolsamos la diferencia aplicando una penalidad de 10% sobre el monto a reembolsar.</li>
+                <li>Si reservaste una oferta, es necesario que los cambios que hagas cumplan con las mismas condiciones para conservar la oferta. Si quieres cambiar tu reservación a una fecha que tenga tarifa con oferta, es necesario hacer una reservacion nueva y cancelar la anterior (aplica la política de cancelacion de hoteles).</li>
+                
+         </ul>
+         
+         <h3>Modificaciones en reservaciones de vuelo</h3>
+         <ul>
+            <li>Deberán solicitarse mínimo 48 horas antes del inicio del viaje.</li>
+            <li>Aplican cargos adicionales en todos los cambios de fecha u hora de vuelo.</li>
+            <li>Los boletos de avión no son transferibles a otra persona o línea aérea, excepto en el caso del fallecimiento del pasajero.</li>
+            <li>Los cambios solicitados aplican para todos los pasajeros de la reservación de vuelo. No es posible aplicar cambios sólo a una parte de los pasajeros.</li>
+         </ul>
+         
+         <h3>Modificaciones en reservaciones de traslado aeropuerto - hotel</h3>
+         <ul>
+             
+            <li>Deberán solicitarse mínimo 24 horas antes del inicio del transporte.</li>
+            <li>Si tu vuelo se atrasa o viajas en otro horario, llámanos tan pronto sea posible para reasignar la hora de tu transporte.</li>
+            <li>Si cambias el tipo de servicio y resulta en un traslado de costo menor, te reembolsamos la diferencia aplicando una penalidad de 10% sobre el total a reembolsar.</li>
+             
+            
+         </ul>
+         
+               <h3>Modificaciones en reservaciones de paquete vuelo + hotel</h3>
+               <ul>
+                  <li>Deberán solicitarse mínimo 48 horas antes del inicio del viaje.</li>
+                  <li>Aplican cargos adicionales en todos los cambios de fecha u hora de vuelo.</li>
+                  <li>Los boletos de avión no son transferibles a otra persona o línea aérea, excepto en el caso del fallecimiento del pasajero.</li>
+                  <li>No hay cambios de hotel a un destino diferente al destino del vuelo.</li>
+                  <li>Es posible aumentar pero no disminuir el número de pasajeros en un vuelo.</li>
+                  <li>No es posible disminuir la duración del viaje.</li>
+               </ul>
+         
+            <h3>Modificaciones en seguros de viaje</h3>
+            <ul>
+               <li>Sólo es posible cambiar nombre del titular de la póliza y las fechas de viaje.</li>
+               <li>Aplican cargos adicionales en todos los cambios de fecha.</li>
+
+            </ul>
+             
+    </div>
+
+
+            </div>
+            <div class="clear"></div>
+
+            
+            <div id="footer">
+                
+            </div>
+            
+        </div>
+        
+        <div id="Footer1_statisticsContainer"></div>
+
+        
+    </div>
+
+    <script type="text/javascript">
+        function setCookie(name, value, days) { var expires = ""; var date = null; if (days) { date = new Date(); date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000)); expires = "; expires=" + date.toGMTString(); } document.cookie = name + "=" + value + expires + "; path=/"; }
+        function changeLanguage() { var preLan = "5"; switch (preLan) { case "1": preLan = "2"; break; case "2": preLan = "1"; break; default: preLan = "0"; break; } setCookie("preLan", preLan, 7); }
+        function movebglogo(id, pos) { document.getElementById(id).style.backgroundPosition = pos; }
+        function monitorMouseMoveForElement(elem) { var isMouseOver = false; _e(elem, "onmouseover", function (evt) { isMouseOver = true; }); _e(elem, "onmouseout", function (evt) { isMouseOver = contains(this, (evt = evt || window.event, evt.relatedTarget || evt.toElement)); }); function contains(cer, cee) { if (cer.contains) { return cer.contains(cee); } else if (typeof cee.parentNode != "undefined") { return (function (cr, ce) { return cr == ce || ce && ce.parentNode && arguments.callee(cr, ce.parentNode) || false; })(cer, cee); } else { return false; } } function _e(obj, evt, func) { if (obj[evt]) { obj[evt] = (function (x) { return function (evt) { func.call(this, evt); return x.call(this, evt); } })(obj[evt]); } else { obj[evt] = func; } } return function () { return isMouseOver; }; }
+        function navigate(url) { var form = document.createElement("form"); form.name = "linkForm"; form.action = url; form.method = "post"; hdn = document.createElement("input"); hdn.setAttribute("type", "hidden"); hdn.setAttribute("id", "ReturnUrl"); hdn.setAttribute("name", "ReturnUrl"); hdn.setAttribute("value", document.location.href); form.appendChild(hdn); document.body.appendChild(form); form.submit(); }
+    </script>
+    
+
+    <script type="text/javascript" src="https://3.cdnpt.com/scripts/header/1.0.25/PT.Scripts.Header-min.js"></script>
+    <script type="text/javascript">
+       
+        var headerScripts = PT.General.Header({
+            isCustomerLoginEnabled: "False",
+           customerSiteUrl: '',
+           customerUriLogout: '',
+           reloadLogout: "False",
+           localSecureUrl: ''
+       });
+        headerScripts.init();
+    </script>
+    
+    <script type="text/javascript">
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+    <script type="text/javascript">
+     try {
+         var pageTracker = _gat._getTracker("UA-28149404-1");
+         pageTracker._trackPageview();
+     } catch (err) { }</script>
+
+
+</body>
+</html>
+

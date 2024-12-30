@@ -1,0 +1,2345 @@
+var monthsShortDot = "Ene_Feb_Mar_Abr_May_Jun_Jul_Ago_Sep_Oct_Nov_Dic".split(
+    "_"
+  ),
+  monthsShort = "ene_feb_mar_abr_may_jun_jul_ago_sep_oct_nov_dic".split("_"),
+  monthsParse = [
+    /^ene/i,
+    /^feb/i,
+    /^mar/i,
+    /^abr/i,
+    /^may/i,
+    /^jun/i,
+    /^jul/i,
+    /^ago/i,
+    /^sep/i,
+    /^oct/i,
+    /^nov/i,
+    /^dic/i,
+  ],
+  monthsRegex =
+    /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i;
+
+window.defineLocaleXD = function () {
+  window.moment.defineLocale("es", {
+    months:
+      "enero_febrero_marzo_abril_mayo_junio_julio_agosto_septiembre_octubre_noviembre_diciembre".split(
+        "_"
+      ),
+    monthsShort: function (m, format) {
+      if (!m) {
+        return monthsShortDot;
+      } else if (/-MMM-/.test(format)) {
+        return monthsShort[m.month()];
+      } else {
+        return monthsShortDot[m.month()];
+      }
+    },
+    monthsRegex: monthsRegex,
+    monthsShortRegex: monthsRegex,
+    monthsStrictRegex:
+      /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)/i,
+    monthsShortStrictRegex:
+      /^(ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i,
+    monthsParse: monthsParse,
+    longMonthsParse: monthsParse,
+    shortMonthsParse: monthsParse,
+    weekdays: "domingo_lunes_martes_miércoles_jueves_viernes_sábado".split("_"),
+    weekdaysShort: "Dom_Lun_Mar_Mié_Jue_Vie_Sáb".split("_"),
+    weekdaysMin: "do_lu_ma_mi_ju_vi_sá".split("_"),
+    weekdaysParseExact: true,
+    longDateFormat: {
+      LT: "H:mm",
+      LTS: "H:mm:ss",
+      L: "DD/MM/YYYY",
+      LL: "D [de] MMMM [de] YYYY",
+      LLL: "D [de] MMMM [de] YYYY H:mm",
+      LLLL: "dddd, D [de] MMMM [de] YYYY H:mm",
+    },
+    calendar: {
+      sameDay: function () {
+        return "[hoy a la" + (this.hours() !== 1 ? "s" : "") + "] LT";
+      },
+      nextDay: function () {
+        return "[mañana a la" + (this.hours() !== 1 ? "s" : "") + "] LT";
+      },
+      nextWeek: function () {
+        return "dddd [a la" + (this.hours() !== 1 ? "s" : "") + "] LT";
+      },
+      lastDay: function () {
+        return "[ayer a la" + (this.hours() !== 1 ? "s" : "") + "] LT";
+      },
+      lastWeek: function () {
+        return (
+          "[el] dddd [pasado a la" + (this.hours() !== 1 ? "s" : "") + "] LT"
+        );
+      },
+      sameElse: "L",
+    },
+    relativeTime: {
+      future: "en %s",
+      past: "hace %s",
+      s: "unos segundos",
+      ss: "%d segundos",
+      m: "un minuto",
+      mm: "%d minutos",
+      h: "una hora",
+      hh: "%d horas",
+      d: "un día",
+      dd: "%d días",
+      w: "una semana",
+      ww: "%d semanas",
+      M: "un mes",
+      MM: "%d meses",
+      y: "un año",
+      yy: "%d años",
+    },
+    dayOfMonthOrdinalParse: /\d{1,2}°/,
+    ordinal: "%d°",
+    week: {
+      dow: 1,
+      doy: 4,
+    },
+    invalidDate: "Fecha inválida",
+  });
+};
+window.defineLocaleXD();
+window.moment.locale("es");
+
+var GetById = (element) => document.getElementById(element);
+
+//Elements
+window.__pt = {};
+window.__pt.config = {
+  suggestionUrl: "https://search-algolia.pricetravel.com/Algolia/Hotel",
+  urlFlights:
+    "https://search-algolia.pricetravel.com/Algolia/Flight",
+  urlPackages:
+    "https://search-algolia.pricetravel.com/Algolia/Package",
+  language: "es",
+  placesTypeHotel: "3,6,7,11,12,14",
+  placesTypePackages: "3,6,7,14",
+  placesTypeFlight: "3,6,7,11,12,14",
+  size: 10,
+  settingPaxes: {
+    minAdults: 1,
+    maxAdults: 8,
+    minChildren: 0,
+    maxChildren: 6,
+    minAge: 0,
+    maxAge: 17,
+    minAgeFlight: 0,
+    maxAgeFlight: 3,
+    rooms: 4,
+  },
+  siteUrl: "https://www.tiquetesbaratos.com/",
+  formatDate: "yyyy-MM-dd",
+  formatDateVuelos: "dd/MM/yyyy",
+  formatBoxDate: "ddd D MMM YYYY",
+  pathFlight: "",
+  pathPackage: "paquetes/resultados",
+};
+
+var valuesDefaultsF = {
+  tripCabin: "N",
+  QuoteList: true,
+  QuoteFlight: true,
+  keyWordId: "undefined",
+  keyWordTable: "undefined",
+  URI: "undefined",
+  actionType: 3,
+  nonStopOnly: false,
+  page: 1,
+};
+//nuevo
+var valuesDefaultsVuelos = {
+  option: "com_sabre",
+  view: "lowfare",
+};
+function MapPaxToUrlVuelos(pax) {
+  let paxesKeys = {};
+  let adults = 0;
+  let kids = 0;
+  let infants = 0;
+  let agekids = [];
+  let rooms = pax.length;
+
+  for (let i = 0; i < rooms; i++) {
+    const room = pax[i];
+    let position = i + 1;
+
+    paxesKeys[`room${position}.adults`] = room.adults;
+    adults += room.adults;
+
+    let childrens = room.children.length;
+    let childreJoin = [];
+    for (let c = 0; c < childrens; c++) {
+      const childrenRoom = room.children[c];
+      childreJoin.push(childrenRoom.years);
+      agekids.push(childrenRoom.years);
+      if (childrenRoom.years > 5) {
+        kids += 1;
+      } else {
+        infants += 1;
+      }
+    }
+  }
+  paxesKeys[`rooms`] = rooms;
+  paxesKeys[`adultos`] = adults;
+  paxesKeys[`ninos`] = infants + kids;
+  for(let x=0;x<agekids.length;x++){
+    let idad=x+1;
+    let paramedad="edad" +idad;
+    paxesKeys[paramedad]=agekids[x];  
+  } 
+
+  return paxesKeys;
+}
+
+//fin nuevo
+function MapPaxToUrl(pax) {
+  let paxesKeys = {};
+  let adults = 0;
+  let kids = 0;
+  let infants = 0;
+  let agekids = [];
+  let rooms = pax.length;
+
+  for (let i = 0; i < rooms; i++) {
+    const room = pax[i];
+    let position = i + 1;
+
+    paxesKeys[`room${position}.adults`] = room.adults;
+    adults += room.adults;
+
+    let childrens = room.children.length;
+    let childreJoin = [];
+    for (let c = 0; c < childrens; c++) {
+      const childrenRoom = room.children[c];
+      childreJoin.push(childrenRoom.years);
+      agekids.push(childrenRoom.years);
+      if (childrenRoom.years > 5) {
+        kids += 1;
+      } else {
+        infants += 1;
+      }
+    }
+    paxesKeys[`room${position}.kids`] = childrens;
+    paxesKeys[`room${position}.agekids`] = childreJoin.join(",");
+  }
+  paxesKeys[`rooms`] = rooms;
+  paxesKeys[`adults`] = adults;
+  paxesKeys[`infants`] = infants;
+  paxesKeys[`kids`] = kids;
+  paxesKeys[`agekids`] = agekids.join(",");
+
+  return paxesKeys;
+}
+
+function formatDate(date, format, utc) {
+  var MMMM = [
+    "\x00",
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+  ];
+  var MMM = [
+    "\x01",
+    "Ene",
+    "Feb",
+    "Mar",
+    "Abr",
+    "May",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dic",
+  ];
+  var dddd = [
+    "\x02",
+    "Domingo",
+    "Lunes",
+    "Martes",
+    "Miercoles",
+    "Jueves",
+    "Viernes",
+    "Sabado",
+  ];
+  var ddd = ["\x03", "Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
+
+  function ii(i, len) {
+    var s = i + "";
+    len = len || 2;
+    while (s.length < len) s = "0" + s;
+    return s;
+  }
+
+  var y = utc ? date.getUTCFullYear() : date.getFullYear();
+  format = format.replace(/(^|[^\\])yyyy+/g, "$1" + y);
+  format = format.replace(/(^|[^\\])yy/g, "$1" + y.toString().substr(2, 2));
+  format = format.replace(/(^|[^\\])y/g, "$1" + y);
+
+  var M = (utc ? date.getUTCMonth() : date.getMonth()) + 1;
+  format = format.replace(/(^|[^\\])MMMM+/g, "$1" + MMMM[0]);
+  format = format.replace(/(^|[^\\])MMM/g, "$1" + MMM[0]);
+  format = format.replace(/(^|[^\\])MM/g, "$1" + ii(M));
+  format = format.replace(/(^|[^\\])M/g, "$1" + M);
+
+  var d = utc ? date.getUTCDate() : date.getDate();
+  format = format.replace(/(^|[^\\])dddd+/g, "$1" + dddd[0]);
+  format = format.replace(/(^|[^\\])ddd/g, "$1" + ddd[0]);
+  format = format.replace(/(^|[^\\])dd/g, "$1" + ii(d));
+  format = format.replace(/(^|[^\\])d/g, "$1" + d);
+
+  var H = utc ? date.getUTCHours() : date.getHours();
+  format = format.replace(/(^|[^\\])HH+/g, "$1" + ii(H));
+  format = format.replace(/(^|[^\\])H/g, "$1" + H);
+
+  var h = H > 12 ? H - 12 : H == 0 ? 12 : H;
+  format = format.replace(/(^|[^\\])hh+/g, "$1" + ii(h));
+  format = format.replace(/(^|[^\\])h/g, "$1" + h);
+
+  var m = utc ? date.getUTCMinutes() : date.getMinutes();
+  format = format.replace(/(^|[^\\])mm+/g, "$1" + ii(m));
+  format = format.replace(/(^|[^\\])m/g, "$1" + m);
+
+  var s = utc ? date.getUTCSeconds() : date.getSeconds();
+  format = format.replace(/(^|[^\\])ss+/g, "$1" + ii(s));
+  format = format.replace(/(^|[^\\])s/g, "$1" + s);
+
+  var f = utc ? date.getUTCMilliseconds() : date.getMilliseconds();
+  format = format.replace(/(^|[^\\])fff+/g, "$1" + ii(f, 3));
+  f = Math.round(f / 10);
+  format = format.replace(/(^|[^\\])ff/g, "$1" + ii(f));
+  f = Math.round(f / 10);
+  format = format.replace(/(^|[^\\])f/g, "$1" + f);
+
+  var T = H < 12 ? "AM" : "PM";
+  format = format.replace(/(^|[^\\])TT+/g, "$1" + T);
+  format = format.replace(/(^|[^\\])T/g, "$1" + T.charAt(0));
+
+  var t = T.toLowerCase();
+  format = format.replace(/(^|[^\\])tt+/g, "$1" + t);
+  format = format.replace(/(^|[^\\])t/g, "$1" + t.charAt(0));
+
+  var tz = -date.getTimezoneOffset();
+  var K = utc || !tz ? "Z" : tz > 0 ? "+" : "-";
+  if (!utc) {
+    tz = Math.abs(tz);
+    var tzHrs = Math.floor(tz / 60);
+    var tzMin = tz % 60;
+    K += ii(tzHrs) + ":" + ii(tzMin);
+  }
+  format = format.replace(/(^|[^\\])K/g, "$1" + K);
+
+  var day = (utc ? date.getUTCDay() : date.getDay()) + 1;
+  format = format.replace(new RegExp(dddd[0], "g"), dddd[day]);
+  format = format.replace(new RegExp(ddd[0], "g"), ddd[day]);
+
+  format = format.replace(new RegExp(MMMM[0], "g"), MMMM[M]);
+  format = format.replace(new RegExp(MMM[0], "g"), MMM[M]);
+
+  format = format.replace(/\\(.)/g, "$1");
+
+  return format;
+}
+
+function $get(url, query = {}, data = {}, headers = {}) {
+  return new Promise((resolve, reject) => {
+    const q = "?" + new URLSearchParams(query);
+
+    fetch(url + q)
+      .then((res) => resolve(res.json()))
+      .catch((err) => reject(res));
+  });
+}
+
+function $get2(url, query = {}, data = {}, headers = {}) {
+  const xmlhttp = new XMLHttpRequest();
+  const q = "?" + new URLSearchParams(query);
+
+  return new Promise((resolve, reject) => {
+    xmlhttp.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        var res = JSON.parse(this.responseText);
+        resolve(res);
+      }
+    };
+
+    xmlhttp.onerror = function () {
+      resolve(null);
+    };
+
+    xmlhttp.open("GET", url + q, true);
+    xmlhttp.send();
+  });
+}
+
+function GetPathUri(type) {
+  let uri = "/";
+  switch (type) {
+    case 6:
+      uri = "hoteles";
+      break;
+    case 3:
+      uri = "hoteles";
+      break;
+    case 11:
+      uri = "hoteles";
+      break;
+    case 7:
+      uri = "hoteles";
+      break;
+    case 14:
+      uri = "hotel";
+      break;
+    case 12:
+      uri = "hoteles";
+      break;
+  }
+
+  return uri;
+}
+
+function openCity(evt, cityName) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("bpt-tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("bpt-tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" bpt-active", "");
+  }
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " bpt-active";
+}
+
+$("#datepicker1").click(function () {
+  $(".c-datepicker").addClass("z-datepicker");
+}),
+  $(".c-datepicker").click(function () {
+    $(this).removeClass("z-datepicker");
+  });
+
+$("#inputDropdownFlight").click(function () {
+  $("#cDropdownFlight").toggleClass("b-d-none");
+});
+$("#inputDropdownPackages").click(function () {
+  $("#cDropdownPackages").toggleClass("b-d-none");
+});
+
+$("#openMinorHotel1").click(function () {
+  $("#cBoxMinorHotel1").removeClass("b-d-none");
+});
+$("#openMinorHotel2").click(function () {
+  $("#cBoxMinorHotel2").removeClass("b-d-none");
+});
+
+$("#openMinorFlight1").click(function () {
+  $("#cBoxMinorFlight1").removeClass("b-d-none");
+});
+
+$("#openMinorPackages1").click(function () {
+  $("#cBoxMinorPackages1").removeClass("b-d-none");
+});
+$("#openMinorPackages2").click(function () {
+  $("#cBoxMinorPackages2").removeClass("b-d-none");
+});
+
+$("#addRoomHotel").click(function () {
+  $("#cRoomHotel02").removeClass("b-d-none");
+});
+
+$("#addRoomPackages").click(function () {
+  $("#cRoomPackages02").removeClass("b-d-none");
+});
+
+$("#cApplyFlight, #closeDropdownFlight").click(function () {
+  $("#cDropdownFlight").addClass("b-d-none");
+});
+$("#cApplyPackages, #closeDropdownPackages").click(function () {
+  $("#cDropdownPackages").addClass("b-d-none");
+});
+
+function Booker(origin, In, Out) {
+  const vm = {};
+  let config = window.__pt.config;
+
+  vm.searchBox = GetById(origin);
+  vm.searchBoxMobile = GetById(origin + "Mobile");
+  vm.closeBtn = GetById("closeBtn");
+  vm.boxList = GetById("list_box_hotel");
+  vm.btnAddRoom = GetById("addRoomHotel");
+  vm.btnApplyRoom = GetById("cApplyHotel");
+  vm.paxesModal = GetById("listRooms1");
+  vm.paxesDropdown = GetById("cDropdownHotel");
+  vm.searchBtn = GetById("searchBtnHotel");
+  vm.paxesBox = GetById("inputDropdownHotel");
+  vm.modalSuggest = document.querySelector(".search-results");
+  vm.now = new Date();
+  vm.placeData = null;
+  vm.data = {
+    paxes: [
+      {
+        adults: 2,
+        children: [],
+      },
+    ],
+    checkIn: In
+      ? new Date(In + ":")
+      : new Date(vm.now.setDate(vm.now.getDate() + 2)),
+    checkOut: Out
+      ? new Date(Out + ":")
+      : new Date(vm.now.setDate(vm.now.getDate() + 8)),
+  };
+
+  function init() {
+    vm.renderPaxes();
+
+    vm.searchBox.addEventListener("click", function (e) {
+      vm.modalSuggest.classList.add("show");
+      vm.modalSuggest.classList.remove("hide");
+
+      if (window.innerWidth <= 767) {
+        vm.searchBoxMobile.focus();
+      }
+    });
+
+    //clicks outside
+    document.addEventListener("click", (event) => {
+      const isClickInside = vm.searchBox.contains(event.target);
+      const inModal = vm.modalSuggest.contains(event.target);
+      const inPaxesBox = vm.paxesDropdown.contains(event.target);
+      const inPaxesInput = vm.paxesBox.contains(event.target);
+
+      if (!isClickInside && !inModal) {
+        vm.hideModal();
+      }
+
+      if (!inPaxesInput && !inPaxesBox) {
+        vm.paxesDropdown.classList.add("b-d-none");
+      }
+    });
+
+    vm.searchBox.addEventListener("keyup", function (e) {
+      vm.onSearch(e.target.value);
+    });
+
+    vm.searchBoxMobile.addEventListener("keyup", function (e) {
+      vm.onSearch(e.target.value);
+    });
+
+    vm.btnAddRoom.onclick = () => {
+      vm.data.paxes.push({
+        adults: 1,
+        children: [],
+      });
+
+      vm.renderPaxes();
+    };
+
+    vm.btnApplyRoom.onclick = () => {
+      if (vm.isValidPax()) {
+        vm.paxesDropdown.classList.add("b-d-none");
+      }
+    };
+
+    vm.paxesBox.onclick = () => {
+      vm.paxesDropdown.classList.remove("b-d-none");
+    };
+
+    vm.searchBtn.onclick = () => {
+      if (!vm.validateBooker()) {
+        return;
+      }
+
+      var path = GetPathUri(vm.data.place_selected.type);
+      var form = document.createElement("form");
+      let paxesData = MapPaxToUrl(vm.data.paxes);
+
+      let data = {
+        placeId: vm.data.place_selected.id,
+        placeType: vm.data.place_selected.type,
+        adults: vm.data.adults,
+        checkin: formatDate(vm.data.checkIn, config.formatDate),
+        checkout: formatDate(vm.data.checkOut, config.formatDate),
+      };
+
+      data = { ...data, ...paxesData };
+
+      form.setAttribute("method", "get");
+      form.setAttribute(
+        "action",
+        `${config.siteUrl}${path}/${vm.data.place_selected.uri}`
+      );
+
+      for (var key in data) {
+        if (data[key]) {
+          var hiddenField = document.createElement("input");
+          hiddenField.setAttribute("type", "hidden");
+          hiddenField.setAttribute("name", key);
+          hiddenField.setAttribute("value", data[key]);
+
+          form.appendChild(hiddenField);
+        }
+      }
+
+      document.body.appendChild(form);
+
+      form.submit();
+    };
+
+    vm.closeBtn.onclick = () => vm.hideModal();
+
+    vm.pickerHotel = new Lightpick({
+      field: document.querySelector(".datepicker1"),
+      secondField: document.querySelector(".datepicker2"),
+      singleDate: false,
+      numberOfMonths: 2,
+      numberOfColumns: 2,
+      tooltipNights: true,
+      hoveringTooltip: true,
+      startDate: vm.data.checkIn,
+      endDate: vm.data.checkOut,
+      minDate: new Date(),
+      minDays: 2,
+      locale: {
+        tooltip: {
+          one: "noche",
+          other: "noches",
+        },
+      },
+      lang: "es",
+      format: "ddd D MMM YYYY",
+      onSelect: function (start, end) {
+        if (start && end) {
+          vm.data["checkIn"] = start.toDate();
+          vm.data["checkOut"] = end.toDate();
+          GetById("datepicker2").classList.remove("has-danger");
+          vm.removeErrorMsg("backErrorHotel");
+        }
+      },
+    });
+  }
+
+  vm.hideModal = function () {
+    vm.modalSuggest.classList.add("hide");
+    vm.modalSuggest.classList.remove("show");
+  };
+
+  vm.onSearch = (value) => {
+    if (!value || (value && value.length < 3)) {
+      vm.boxList.innerHTML = "";
+      return;
+    }
+
+    const params = {
+      query: value,
+      language: config.language,
+      placeTypes: config.placesTypeHotel,
+      from: 0,
+      size: config.size,
+      usersearch: "ifsiy6slswes",
+    };
+
+    $get(config.suggestionUrl, params)
+      .then((data) => {
+        if (data && data.length) {
+          vm.boxList.innerHTML = "";
+          data.map((suggestion) => {
+            let btn = document.createElement("button");
+            btn.type = "button";
+            btn.className =
+              "list-group-item list-group-item-action list-group-item-hover";
+            //codigo alonso
+            var suggestionContentArr = suggestion.displayHtml.split(',');
+            var suggestionContentMain = suggestionContentArr.splice(0,1).join("");
+            var suggestionContentSecond = suggestionContentArr.join(", ");
+
+
+            btn.innerHTML = `
+              <div class="autocomplete-box">
+                  <div class="autocomplete-name-icon">
+                      <i class="font-icons icons-globe-outline"></i>
+                  </div>
+                <div class="autocomplete-name-data pl-1 ml-1">
+                  <div class="wrap-elipsis pl-0">
+                    ${suggestionContentMain}
+                  </div>
+                  ${
+                    suggestionContentSecond.length > 1 ? 
+                    `<small class="d-block col-12 pl-0">
+                    ${suggestionContentSecond}
+                    </small>`
+                    : ""
+                  }
+                </div>
+              </div>
+            `;
+
+            //fin codigo alonso        
+
+            btn.onclick = function () {
+              vm.searchBox.value = suggestion.displayText;
+              vm.searchBoxMobile.value = suggestion.displayText;
+              vm.placeData = suggestion;
+              vm.data.place_name = suggestion.displayText;
+              vm.data.place_selected = suggestion;
+              vm.hideModal();
+              vm.searchBox.classList.remove("has-danger");
+              vm.removeErrorMsg("inputHotelError");
+            };
+
+            vm.boxList.appendChild(btn);
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  vm.renderPaxes = () => {
+    vm.paxesModal.innerHTML = "";
+    vm.data.paxes.map((item, index) => {
+      const template = `
+            <div id="cRomm01" class="bpt-d-int">
+            <label class="b-w-100 b-c-title b-d-header">
+              <span>Habitación ${index + 1}</span>
+              <span id="closeDropdownHotel${
+                index + 1
+              }" onclick="booker.removeRoom(event,${index})" class="b-simple-icon material-icons">close</span>
+            </label>
+    
+            <div class="b-row b-mb-3">
+              <div class="b-col-6">Adultos</div>
+              <div class="b-col-2 b-p-0 ">
+                <div class="b-btn-circle" onclick="booker.removeAdult(event,${index})">
+                  <span class="b-simple-icon material-icons">remove</span>
+                </div>
+              </div>
+              <div class="b-col-2 b-p-0">
+                <span class="b-result">${item.adults}</span>
+              </div>
+              <div class="b-col-2 b-p-0 ">
+                <div class="b-btn-circle" onclick="booker.addAdult(event,${index})">
+                  <span class="b-simple-icon material-icons">add</span>
+                </div>
+              </div>
+            </div>
+    
+            <div class="b-row b-mb-3">
+              <div class="b-col-6 b-mb-4">Menores</div>
+              <div class="b-col-2 b-p-0 ">
+                <div class="b-btn-circle" onclick="booker.removeChild(event,${index})">
+                  <span class="b-simple-icon material-icons">remove</span>
+                </div>
+              </div>
+              <div class="b-col-2 b-p-0">
+                <span class="b-result">${item.children.length}</span>
+              </div>
+              <div class="b-col-2 b-p-0 ">
+                <div id="openMinorHotel1" class="b-btn-circle" onclick="booker.addChild(event,${index})">
+                  <span class="b-simple-icon material-icons">add</span>
+                </div>
+              </div>
+
+              <div id="cBoxMinorHotel1" class=" b-c-minor b-w-100 ${
+                item.children.length ? "" : "b-d-none"
+              }">
+    
+    
+                <div class="b-row">
+
+                ${item.children
+                  .map((child, ind) => {
+                    return `
+                    <div class="b-col-12">
+                        <div class="b-form-group" id="parentAgeHotelR${
+                          index + 1
+                        }C${ind + 1}">
+                        <div class="b-row">
+                        <div class="b-col-6" style="padding: 5px 2px 2px 16px;">
+                        <label for="exampleFormControlSelect1">Edad menor ${
+                          ind + 1
+                        }</label>
+                        </div>
+                        <div class="b-col-6">
+                        <select class="b-form-control" id="ageFormSelectR${
+                          index + 1
+                        }C${ind + 1}" name="childrenAgeR${index + 1}C${
+                      ind + 1
+                    }" onchange="booker.setAgeChild(event, ${index}, ${ind})" required>
+                            <option value="">Edad</option>
+                            ${vm.getListAges(child.years)}
+                        </select>
+                        </div>
+                        </div>
+                        </div>
+                    </div>
+                    `;
+                  })
+                  .join("")}
+                  
+                  
+                </div>
+    
+              </div>
+            </div>
+          </div>
+          <div class="b-row">
+                  <div class="b-col-12 b-hr"></div>
+                </div>
+            `;
+
+      vm.paxesModal.innerHTML += template;
+    });
+
+    vm.paxesBox.value = vm.getPaxInputString();
+  };
+
+  vm.getPaxInputString = () => {
+    const totalAdults = vm.data.paxes.reduce(
+      (prev, current) => prev + current.adults,
+      0
+    );
+    const totalKids = vm.data.paxes.reduce(
+      (prev, current) => prev + current.children.length,
+      0
+    );
+    const rooms = vm.data.paxes.length;
+    const roomString = rooms === 1 ? "Habitación" : "Habitaciones";
+
+    return `${totalAdults} Adulto${totalAdults === 1 ? "" : "s"}${
+      totalKids
+        ? ", " + totalKids + " Menor" + (totalKids === 1 ? "" : "es")
+        : ""
+    }, ${rooms} ${roomString}`;
+  };
+
+  vm.getListAges = (year) => {
+    let str = ``;
+    for (
+      let a = config.settingPaxes.minAge;
+      a < config.settingPaxes.maxAge + 1;
+      a++
+    ) {
+      str += `<option value="${a}" ${
+        year && +year === a && year ? "selected" : ""
+      }>${a} años</option>`;
+    }
+
+    return str;
+  };
+
+  vm.removeRoom = (e, index) => {
+    e.stopPropagation();
+    if (index === 0) {
+      if (vm.isValidPax()) vm.paxesDropdown.classList.add("b-d-none");
+      return;
+    }
+    vm.data.paxes.splice(index, 1);
+    vm.renderPaxes();
+  };
+
+  vm.addAdult = (e, index) => {
+    e.stopPropagation();
+    if (vm.data.paxes[index].adults < config.settingPaxes.maxAdults) {
+      vm.data.paxes[index].adults += 1;
+      vm.renderPaxes();
+    }
+  };
+
+  vm.removeAdult = (e, index) => {
+    e.stopPropagation();
+    if (vm.data.paxes[index].adults > 1) {
+      vm.data.paxes[index].adults -= 1;
+      vm.renderPaxes();
+    }
+  };
+
+  vm.addChild = (e, index) => {
+    e.stopPropagation();
+    if (vm.data.paxes[index].children.length < config.settingPaxes.maxChildren)
+      vm.data.paxes[index].children.push({ years: null });
+    vm.renderPaxes();
+  };
+
+  vm.removeChild = (e, index) => {
+    e.stopPropagation();
+    vm.data.paxes[index].children.pop();
+    vm.renderPaxes();
+  };
+
+  vm.setAgeChild = (evt, room, child) => {
+    vm.data.paxes[room].children[child].years = evt.target.value;
+
+    vm.removeErrorMsg(`errorChildHotelR${room + 1}C${child + 1}`);
+    GetById(`ageFormSelectR${room + 1}C${child + 1}`).classList.remove(
+      "is-invalid"
+    );
+  };
+
+  vm.validateBooker = () => {
+    let valid = true;
+    if (!vm.data.place_selected) {
+      vm.searchBox.classList.add("has-danger");
+      vm.addMessageError(
+        "bformHotel",
+        "Selecciona tu destino",
+        "inputHotelError"
+      );
+
+      valid = false;
+    }
+
+    if (!vm.isValidDate(vm.data.checkIn, vm.data.checkOut)) {
+      valid = false;
+    }
+
+    if (!vm.isValidPax()) {
+      setTimeout(() => {
+        vm.paxesDropdown.classList.remove("b-d-none");
+      }, 200);
+      valid = false;
+    }
+
+    return valid;
+  };
+
+  vm.addMessageError = (container, message, id) => {
+    if (GetById(id)) {
+      return;
+    }
+
+    let msg = document.createElement("div");
+    msg.className = "invalid-feedback";
+    msg.id = id;
+    msg.innerText = message;
+    GetById(container).appendChild(msg);
+  };
+
+  vm.removeErrorMsg = (msgId) => {
+    let element = GetById(msgId);
+    if (element) {
+      element.remove();
+    }
+  };
+
+  vm.isValidPax = () => {
+    let valid = true;
+    let rooms = vm.data.paxes.length;
+
+    for (let i = 0; i < rooms; i++) {
+      const room = vm.data.paxes[i];
+
+      let childrens = room.children.length;
+      for (let c = 0; c < childrens; c++) {
+        let inputKid = GetById(`ageFormSelectR${i + 1}C${c + 1}`);
+        if (inputKid.value === "") {
+          inputKid.classList.add("is-invalid");
+          vm.addMessageError(
+            `parentAgeHotelR${i + 1}C${c + 1}`,
+            "Elige su edad",
+            `errorChildHotelR${i + 1}C${c + 1}`
+          );
+          valid = false;
+        }
+      }
+    }
+
+    return valid;
+  };
+
+  vm.isValidDate = (dateFrom, dateTo) => {
+    let valid = true;
+
+    dateFrom.setHours(0, 0, 0, 0);
+    dateTo.setHours(0, 0, 0, 0);
+
+    if (+dateFrom > +dateTo) {
+      GetById("datepicker2").classList.add("has-danger");
+      vm.addMessageError(
+        "parentBackHotel",
+        "Elige tu fecha de regreso",
+        "backErrorHotel"
+      );
+      valid = false;
+    }
+
+    return valid;
+  };
+
+  init();
+
+  return vm;
+}
+
+//Hotel
+var booker = Booker("place_name_hotel");
+
+function BookerF(origin, destination) {
+  const vm = {};
+  let config = window.__pt.config;
+
+  vm.searchBoxOrigin = GetById(origin);
+  vm.searchBoxDestination = GetById(destination);
+  vm.searchBoxOriginMobile = GetById(origin + "Mobile");
+  vm.searchBoxDestinationMobile = GetById(destination + "Mobile");
+  vm.closeBtn = GetById("closeBtn2");
+  vm.closeBtn2 = GetById("closeBtn3");
+  vm.boxList = GetById("list_box_flight");
+  vm.boxList2 = GetById("list_box_flight2");
+  vm.btnApplyRoom = GetById("cApplyFlight");
+  vm.paxesModal = GetById("listRooms2");
+  vm.paxesDropdown = GetById("cDropdownFlight");
+  vm.searchBtn = GetById("searchBtnFlight");
+  vm.paxesBox = GetById("inputDropdownFlight");
+  vm.modalSuggest = document.querySelector(".search-results_f_o");
+  vm.modalSuggest2 = document.querySelector(".search-results_f_d");
+  vm.elementoActivo = document.querySelectorAll('input[name="flight-mode"]');
+  vm.now = new Date();
+  vm.placeData = null;
+  vm.data = {
+    paxes: [
+      {
+        adults: 1,
+        children: [],
+      },
+    ],
+    checkIn: new Date(vm.now.setDate(vm.now.getDate() + 2)),
+    checkOut: new Date(vm.now.setDate(vm.now.getDate() + 8)),
+    mode: "redondo",
+  };
+
+  function init() {
+    vm.renderPaxes();
+
+    vm.searchBoxOrigin.addEventListener("click", function (e) {
+      vm.modalSuggest.classList.add("show");
+      vm.modalSuggest.classList.remove("hide");
+
+      if (window.innerWidth <= 767) {
+        vm.searchBoxOriginMobile.focus();
+      }
+    });
+
+    vm.searchBoxDestination.addEventListener("click", function (e) {
+      vm.modalSuggest2.classList.add("show");
+      vm.modalSuggest2.classList.remove("hide");
+
+      if (window.innerWidth <= 767) {
+        vm.searchBoxDestinationMobile.focus();
+      }
+    });
+
+    //clicks outside
+    document.addEventListener("click", (event) => {
+      const isClickInside = vm.searchBoxOrigin.contains(event.target);
+      const inModal = vm.modalSuggest.contains(event.target);
+
+      const isClickInside2 = vm.searchBoxDestination.contains(event.target);
+      const inModal2 = vm.modalSuggest2.contains(event.target);
+
+      const inPaxesBox = vm.paxesDropdown.contains(event.target);
+      const inPaxesInput = vm.paxesBox.contains(event.target);
+
+      if (!isClickInside && !inModal) {
+        vm.hideModal();
+      }
+
+      if (!isClickInside2 && !inModal2) {
+        vm.hideModal2();
+      }
+
+      if (!inPaxesInput && !inPaxesBox) {
+        vm.paxesDropdown.classList.add("b-d-none");
+      }
+    });
+
+    vm.searchBoxOrigin.addEventListener("keyup", function (e) {
+      vm.onSearch(e.target.value);
+    });
+
+    vm.searchBoxOriginMobile.addEventListener("keyup", function (e) {
+      vm.onSearch(e.target.value);
+    });
+
+    vm.searchBoxDestination.addEventListener("keyup", function (e) {
+      vm.onSearch2(e.target.value);
+    });
+
+    vm.searchBoxDestinationMobile.addEventListener("keyup", function (e) {
+      vm.onSearch2(e.target.value);
+    });
+
+    vm.btnApplyRoom.onclick = () => {
+      if (vm.isValidPax()) {
+        vm.paxesDropdown.classList.add("b-d-none");
+      }
+    };
+
+    vm.paxesBox.onclick = () => {
+      vm.paxesDropdown.classList.remove("b-d-none");
+    };
+
+//nuevo checkbox
+    vm.elementoActivo[0].onclick= () => {
+      vm.data.mode="redondo";
+    };
+    vm.elementoActivo[1].onclick= () => {
+      vm.data.mode="unavia";
+    };
+//fin nuevo checkbox
+
+
+    vm.searchBtn.onclick = () => {
+      if (!vm.validateBooker()) {
+        return;
+      }
+
+      let path = config.pathFlight;
+      let form = document.createElement("form");
+      let paxesData = MapPaxToUrlVuelos(vm.data.paxes);
+
+      let data = {
+        evento: 'busquedahome',
+        transporte: vm.data.mode,
+        //radiogroup: "on",
+        origen: vm.data.place_selected.Code,
+        destino: vm.data.place_selected_to.Code,
+        from: formatDate(vm.data.checkIn, config.formatDateVuelos),
+        to: formatDate(vm.data.checkOut, config.formatDateVuelos),
+        //mode: +vm.data.mode,
+      };
+
+      data = { ...data, ...paxesData, ...valuesDefaultsVuelos };
+
+      form.setAttribute("method", "get");
+      form.setAttribute("action", `${config.siteUrl}${path}`);
+
+      for (var key in data) {
+        if (data[key]) {
+          var hiddenField = document.createElement("input");
+          hiddenField.setAttribute("type", "hidden");
+          hiddenField.setAttribute("name", key);
+          hiddenField.setAttribute("value", data[key]);
+
+          form.appendChild(hiddenField);
+        }
+      }
+
+      document.body.appendChild(form);
+
+      form.submit();
+    };
+
+    vm.closeBtn.onclick = () => vm.hideModal();
+    vm.closeBtn2.onclick = () => vm.hideModal2();
+
+    vm.pickerFlight = new Lightpick({
+      field: GetById("datepicker3"),
+      secondField: GetById("datepicker4"),
+      repick: false,
+      singleDate: false,
+      numberOfMonths: 2,
+      numberOfColumns: 2,
+      tooltipNights: true,
+      hoveringTooltip: true,
+      startDate: vm.data.checkIn,
+      endDate: vm.data.checkOut,
+      minDate: new Date(),
+      minDays: 2,
+      locale: {
+        tooltip: {
+          one: "noche",
+          other: "noches",
+        },
+      },
+      lang: "es",
+      format: "ddd D MMM YYYY",
+      onSelect: function (start, end) {
+        if (start && end) {
+          vm.data["checkIn"] = start.toDate();
+          vm.data["checkOut"] = end.toDate();
+          GetById("datepicker2").classList.remove("has-danger");
+          vm.removeErrorMsg("backErrorFlight");
+        }
+      },
+    });
+  }
+
+  vm.hideModal = function () {
+    vm.modalSuggest.classList.add("hide");
+    vm.modalSuggest.classList.remove("show");
+  };
+
+  vm.hideModal2 = function () {
+    vm.modalSuggest2.classList.add("hide");
+    vm.modalSuggest2.classList.remove("show");
+  };
+
+  vm.onSearch = (value) => {
+    if (!value || (value && value.length < 3)) {
+      vm.boxList.innerHTML = "";
+      return;
+    }
+
+    const params = {
+      query: value,
+      language: config.language,
+      size: 10,
+      placeTypes: "3,6,7,12",
+      from:0,
+      usersearch: "ifsiy6slswes",
+    };
+
+    $get2(config.urlFlights, params)
+      .then((data) => {
+        if (data && data.length) {
+          vm.boxList.innerHTML = "";
+          data.map((suggestionNew) => {
+            /*var suggestion = {
+              Id: suggestionNew.id,
+              Code: suggestionNew.code,
+              DisplayText: suggestionNew.displayText,
+              DisplayHtml: suggestionNew.displayHtml,
+              Country: suggestionNew.country,
+            };*/
+           //codigo alonso
+           var suggestion = {
+            Id: suggestionNew.id,
+            Code: suggestionNew.code,
+            DisplayText: suggestionNew.displayText,
+            DisplayHtml: suggestionNew.displayHtml,
+            Country: suggestionNew.country,
+            Type: suggestionNew.type,
+            DestinationHtml: suggestionNew.displayDestinationHtml
+          };
+          //fin codigo alonso 
+
+            let btn = document.createElement("button");
+            btn.type = "button";
+            btn.className =
+              "list-group-item list-group-item-action list-group-item-hover";
+            /*btn.innerHTML = `<div class="autocomplete-box">
+                    <div class="autocomplete-name-icon">
+                      <i class="font-icons icons-world"></i>
+                    </div>
+                    <div class="autocomplete-name-data pl-1">${suggestion.DisplayHtml}</div>
+                  </div>
+                  ${
+                    suggestion.Code
+                      ? '<span class="autocomplete-counter d-none d-md-block">' +
+                        suggestion.Code +
+                        "</span>"
+                      : ""
+                  }                  
+                  `
+                  ;*/
+                  //codigo alonso
+                  btn.innerHTML = `
+                  <span class="autocomplete-item">
+                    <span class="autocomplete-option">
+                      <span class="autocomplete-box">
+                        <span class="autocomplete-name-data-algolia pl-1">
+                          <span>
+                            ${suggestion.DisplayHtml}
+                          </span>
+                          ${
+                            suggestion.Type != 1 && suggestion.Code && suggestion.Code.length > 0 ?
+                            "<small>("+suggestion.Code+")</small>" : ""
+                          }
+                          <br />
+                          ${
+                            suggestion.Type == 1 ?
+                            "<small>Todos los aeropuertos, </small>" : ""
+                          }
+                          <small>
+                            ${suggestion.DestinationHtml}
+                          </small>
+                        </span>
+                      </span>
+                    </span>
+                  </span>
+                `;                  
+                  // fin codigo alonso
+
+            btn.onclick = function () {
+              vm.searchBoxOrigin.value = suggestion.DisplayText;
+              vm.searchBoxOriginMobile.value = suggestion.DisplayText;
+              vm.placeData = suggestion;
+              vm.data.place_name = suggestion.DisplayText;
+              vm.data.place_selected = suggestion;
+              vm.hideModal();
+              vm.searchBoxOrigin.classList.remove("has-danger");
+              vm.removeErrorMsg("inputFlightError");
+            };
+
+            vm.boxList.appendChild(btn);
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  vm.onSearch2 = (value) => {
+    if (!value || (value && value.length < 3)) {
+      vm.boxList2.innerHTML = "";
+      return;
+    }
+
+    const params = {
+      query: value,
+      language: config.language,
+      size: 10,
+      placeTypes: "3,6,7,12",
+      from:0,
+      usersearch: "ifsiy6slswes",
+    };
+
+    $get2(config.urlFlights, params)
+      .then((data) => {
+        if (data && data.length) {
+          vm.boxList2.innerHTML = "";
+          data.map((suggestionNew) => {
+            /*var suggestion = {
+              Id: suggestionNew.id,
+              Code: suggestionNew.code,
+              DisplayText: suggestionNew.displayText,
+              DisplayHtml: suggestionNew.displayHtml,
+              Country: suggestionNew.country,
+            };*/
+            
+            //codigo alonso
+            var suggestion = {
+              Id: suggestionNew.id,
+              Code: suggestionNew.code,
+              DisplayText: suggestionNew.displayText,
+              DisplayHtml: suggestionNew.displayHtml,
+              Country: suggestionNew.country,
+              Type: suggestionNew.type,
+              DestinationHtml: suggestionNew.displayDestinationHtml
+            };
+            //fin codigo alonsa
+
+            let btn = document.createElement("button");
+            btn.type = "button";
+            btn.className =
+              "list-group-item list-group-item-action list-group-item-hover";
+            /*btn.innerHTML = `<div class="autocomplete-box">
+                    <div class="autocomplete-name-icon">
+                      <i class="font-icons icons-world"></i>
+                    </div>
+                    <div class="autocomplete-name-data pl-1">${suggestion.DisplayHtml}</div>
+                  </div>
+                  ${
+                    suggestion.Code
+                      ? '<span class="autocomplete-counter d-none d-md-block">' +
+                        suggestion.Code +
+                        "</span>"
+                      :"" 
+                  }                  
+                  `;*/
+              //codigo alonso
+              btn.innerHTML = `
+              <span class="autocomplete-item">
+                <span class="autocomplete-option">
+                  <span class="autocomplete-box">
+                    <span class="autocomplete-name-data-algolia pl-1">
+                      <span>
+                        ${suggestion.DisplayHtml}
+                      </span>
+                      ${
+                        suggestion.Type != 1 && suggestion.Code && suggestion.Code.length > 0 ?
+                        "<small>("+suggestion.Code+")</small>" : ""
+                      }
+                      <br />
+                      ${
+                        suggestion.Type == 1 ?
+                        "<small>Todos los aeropuertos, </small>" : ""
+                      }
+                      <small>
+                        ${suggestion.DestinationHtml}
+                      </small>
+                    </span>
+                  </span>
+                </span>
+              </span>
+            `;              
+              //fin codigo alonso   
+
+            btn.onclick = function () {
+              vm.searchBoxDestination.value = suggestion.DisplayText;
+              vm.searchBoxDestinationMobile.value = suggestion.DisplayText;
+              vm.placeData_to = suggestion;
+              vm.data.place_name_to = suggestion.DisplayText;
+              vm.data.place_selected_to = suggestion;
+              vm.hideModal2();
+              vm.searchBoxDestination.classList.remove("has-danger");
+              vm.removeErrorMsg("inputFlightError_to");
+            };
+
+            vm.boxList2.appendChild(btn);
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  vm.renderPaxes = () => {
+    vm.paxesModal.innerHTML = "";
+    vm.data.paxes.map((item, index) => {
+      const template = `
+            <div id="cRomm01" class="bpt-d-int">
+    
+            <div class="b-row b-mb-3">
+              <div class="b-col-6">Adultos</div>
+              <div class="b-col-2 b-p-0 ">
+                <div class="b-btn-circle" onclick="bookerF.removeAdult(event,${index})">
+                  <span class="b-simple-icon material-icons">remove</span>
+                </div>
+              </div>
+              <div class="b-col-2 b-p-0">
+                <span class="b-result">${item.adults}</span>
+              </div>
+              <div class="b-col-2 b-p-0 ">
+                <div class="b-btn-circle" onclick="bookerF.addAdult(event,${index})">
+                  <span class="b-simple-icon material-icons">add</span>
+                </div>
+              </div>
+            </div>
+    
+            <div class="b-row b-mb-3">
+              <div class="b-col-6">Niños</div>
+              <div class="b-col-2 b-p-0 ">
+                <div class="b-btn-circle" onclick="bookerF.removeChild(event,${index})">
+                  <span class="b-simple-icon material-icons">remove</span>
+                </div>
+              </div>
+              <div class="b-col-2 b-p-0">
+                <span class="b-result">${item.children.length}</span>
+              </div>
+              <div class="b-col-2 b-p-0 ">
+                <div id="openMinorFlight1" class="b-btn-circle" onclick="bookerF.addChild(event,${index})">
+                  <span class="b-simple-icon material-icons">add</span>
+                </div>
+              </div>
+
+              <div id="cBoxMinorFlight1" class=" b-c-minor b-w-100 ${
+                item.children.length ? "" : "b-d-none"
+              }">
+    
+                <div class="b-row">
+                  <div class="b-col-12">
+                    <label class="b-mt-3 b-d-block">¿Cuál es su edad? * </label>
+                  </div>
+                </div>
+    
+                <div class="b-row">
+
+                ${item.children
+                  .map((child, ind) => {
+                    return `
+                    <div class="b-col-12">
+                        <div class="b-form-group" id="parentAgeFlightR${
+                          index + 1
+                        }C${ind + 1}">
+                        <select class="b-form-control" id="ageFormSelectR${
+                          index + 1
+                        }C${ind + 1}" name="childrenAgeR${index + 1}C${
+                      ind + 1
+                    }" onchange="bookerF.setAgeChild(event, ${index}, ${ind})" required>
+                            <option value="">Niño ${ind + 1}</option>
+                            ${vm.getListAges(child.years)}
+                        </select>
+                        </div>
+                    </div>
+                    `;
+                  })
+                  .join("")}
+                  
+                  
+                </div>
+    
+              </div>
+            </div>
+          </div>
+          <div class="b-row">
+                  <div class="b-col-12 b-hr"></div>
+                </div>
+            `;
+
+      vm.paxesModal.innerHTML += template;
+    });
+
+    vm.paxesBox.value = vm.getPaxInputString();
+  };
+
+  vm.getPaxInputString = () => {
+    const totalAdults = vm.data.paxes.reduce(
+      (prev, current) => prev + current.adults,
+      0
+    );
+    const totalKids = vm.data.paxes.reduce(
+      (prev, current) => prev + current.children.length,
+      0
+    );
+
+    return `${totalAdults} Adulto${totalAdults === 1 ? "" : "s"}${
+      totalKids
+        ? ", " + totalKids + " Niño" + (totalKids === 1 ? "" : "s")
+        : ""
+    }`;
+  };
+
+  vm.getListAges = (year) => {
+    let str = ``;
+    const ageOptions = ["","0 a 24 meses (En brazos)","", "2 a 11 años"];
+    for (
+      let a = config.settingPaxes.minAgeFlight;
+      a < config.settingPaxes.maxAgeFlight + 1;
+      a++
+    ) {
+      if (a == 1 || a==3){    
+      str += `<option value="${a}" ${
+        year && +year === a && year ? "selected" : ""
+      }>${ageOptions[a]}</option>`;
+      }
+    }
+
+    return str;
+  };
+
+  vm.removeRoom = (e, index) => {
+    e.stopPropagation();
+    if (index === 0) {
+      if (vm.isValidPax()) vm.paxesDropdown.classList.add("b-d-none");
+      return;
+    }
+    vm.data.paxes.splice(index, 1);
+    vm.renderPaxes();
+  };
+
+  vm.addAdult = (e, index) => {
+    e.stopPropagation();
+    if (vm.data.paxes[index].adults < config.settingPaxes.maxAdults) {
+      vm.data.paxes[index].adults += 1;
+      vm.renderPaxes();
+    }
+  };
+
+  vm.removeAdult = (e, index) => {
+    e.stopPropagation();
+    if (vm.data.paxes[index].adults > 1) {
+      vm.data.paxes[index].adults -= 1;
+      vm.renderPaxes();
+    }
+  };
+
+  vm.addChild = (e, index) => {
+    e.stopPropagation();
+    if (vm.data.paxes[index].children.length < config.settingPaxes.maxChildren)
+      vm.data.paxes[index].children.push({ years: null });
+    vm.renderPaxes();
+  };
+
+  vm.removeChild = (e, index) => {
+    e.stopPropagation();
+    vm.data.paxes[index].children.pop();
+    vm.renderPaxes();
+  };
+
+  vm.setAgeChild = (evt, room, child) => {
+    vm.data.paxes[room].children[child].years = evt.target.value;
+
+    vm.removeErrorMsg(`errorChildFlightR${room + 1}C${child + 1}`);
+    GetById(`ageFormSelectR${room + 1}C${child + 1}`).classList.remove(
+      "is-invalid"
+    );
+  };
+
+  vm.validateBooker = () => {
+    let valid = true;
+    if (!vm.data.place_selected) {
+      vm.searchBoxOrigin.classList.add("has-danger");
+      vm.addMessageError(
+        "bformFlight",
+        "Selecciona tu origen",
+        "inputFlightError"
+      );
+
+      valid = false;
+    }
+
+    if (!vm.data.place_selected_to) {
+      vm.searchBoxDestination.classList.add("has-danger");
+      vm.addMessageError(
+        "bformFlight_to",
+        "Selecciona tu destino",
+        "inputFlightError_to"
+      );
+
+      valid = false;
+    }
+
+    if (!vm.isValidDate(vm.data.checkIn, vm.data.checkOut)) {
+      valid = false;
+    }
+
+    if (!vm.isValidPax()) {
+      setTimeout(() => {
+        vm.paxesDropdown.classList.remove("b-d-none");
+      }, 200);
+      valid = false;
+    }
+
+    return valid;
+  };
+
+  vm.addMessageError = (container, message, id) => {
+    if (GetById(id)) {
+      return;
+    }
+
+    let msg = document.createElement("div");
+    msg.className = "invalid-feedback";
+    msg.id = id;
+    msg.innerText = message;
+    GetById(container).appendChild(msg);
+  };
+
+  vm.removeErrorMsg = (msgId) => {
+    let element = GetById(msgId);
+    if (element) {
+      element.remove();
+    }
+  };
+
+  vm.isValidPax = () => {
+    let valid = true;
+    let rooms = vm.data.paxes.length;
+
+    for (let i = 0; i < rooms; i++) {
+      const room = vm.data.paxes[i];
+
+      let childrens = room.children.length;
+      for (let c = 0; c < childrens; c++) {
+        let inputKid = GetById(`ageFormSelectR${i + 1}C${c + 1}`);
+        if (inputKid.value === "") {
+          inputKid.classList.add("is-invalid");
+          vm.addMessageError(
+            `parentAgeFlightR${i + 1}C${c + 1}`,
+            "Elige su edad",
+            `errorChildFlightR${i + 1}C${c + 1}`
+          );
+          valid = false;
+        }
+      }
+    }
+
+    return valid;
+  };
+
+  vm.isValidDate = (dateFrom, dateTo) => {
+    let valid = true;
+
+    dateFrom.setHours(0, 0, 0, 0);
+    dateTo.setHours(0, 0, 0, 0);
+
+    if (+dateFrom > +dateTo) {
+      GetById("datepicker4").classList.add("has-danger");
+      vm.addMessageError(
+        "parentBackFlight",
+        "Elige tu fecha de regreso",
+        "backErrorFlight"
+      );
+      valid = false;
+    }
+
+    return valid;
+  };
+
+  init();
+
+  return vm;
+}
+
+//vuelo
+var bookerF = BookerF("place_name_flight_o", "place_name_flight_d");
+
+function BookerP(origin, destination) {
+  const vm = {};
+  let config = window.__pt.config;
+  let _placesTypes = {};
+
+  vm.searchBoxOrigin = GetById(origin);
+  vm.searchBoxDestination = GetById(destination);
+  vm.searchBoxOriginMobile = GetById(origin + "Mobile");
+  vm.searchBoxDestinationMobile = GetById(destination + "Mobile");
+  vm.closeBtn = GetById("closeBtn4");
+  vm.closeBtn2 = GetById("closeBtn5");
+  vm.boxList = GetById("list_box_package");
+  vm.boxList2 = GetById("list_box_package2");
+  vm.btnApplyRoom = GetById("cApplyPackage");
+  vm.paxesModal = GetById("listRooms3");
+  vm.paxesDropdown = GetById("cDropdownPackage");
+  vm.searchBtn = GetById("searchBtnPackage");
+  vm.paxesBox = GetById("inputDropdownPackage");
+  vm.btnAddRoom = GetById("addRoomPackage");
+  vm.modalSuggest = document.querySelector(".search-results_p_o");
+  vm.modalSuggest2 = document.querySelector(".search-results_p_d");
+  vm.now = new Date();
+  vm.placeData = null;
+  vm.data = {
+    paxes: [
+      {
+        adults: 1,
+        children: [],
+      },
+    ],
+    checkIn: new Date(vm.now.setDate(vm.now.getDate() + 2)),
+    checkOut: new Date(vm.now.setDate(vm.now.getDate() + 8)),
+    mode: true,
+  };
+
+  function init() {
+    vm.renderPaxes();
+    getInitialPlaces();
+
+    vm.searchBoxOrigin.addEventListener("click", function (e) {
+      vm.modalSuggest.classList.add("show");
+      vm.modalSuggest.classList.remove("hide");
+
+      if (window.innerWidth <= 767) {
+        vm.searchBoxOriginMobile.focus();
+      }
+    });
+
+    vm.searchBoxDestination.addEventListener("click", function (e) {
+      vm.modalSuggest2.classList.add("show");
+      vm.modalSuggest2.classList.remove("hide");
+
+      if (window.innerWidth <= 767) {
+        vm.searchBoxDestinationMobile.focus();
+      }
+    });
+
+    //clicks outside
+    document.addEventListener("click", (event) => {
+      const isClickInside = vm.searchBoxOrigin.contains(event.target);
+      const inModal = vm.modalSuggest.contains(event.target);
+
+      const isClickInside2 = vm.searchBoxDestination.contains(event.target);
+      const inModal2 = vm.modalSuggest2.contains(event.target);
+
+      const inPaxesBox = vm.paxesDropdown.contains(event.target);
+      const inPaxesInput = vm.paxesBox.contains(event.target);
+
+      if (!isClickInside && !inModal) {
+        vm.hideModal();
+      }
+
+      if (!isClickInside2 && !inModal2) {
+        vm.hideModal2();
+      }
+
+      if (!inPaxesInput && !inPaxesBox) {
+        vm.paxesDropdown.classList.add("b-d-none");
+      }
+    });
+
+    vm.searchBoxOrigin.addEventListener("keyup", function (e) {
+      vm.onSearch(e.target.value);
+    });
+
+    vm.searchBoxOriginMobile.addEventListener("keyup", function (e) {
+      vm.onSearch(e.target.value);
+    });
+
+    vm.searchBoxDestination.addEventListener("keyup", function (e) {
+      vm.onSearch2(e.target.value);
+    });
+
+    vm.searchBoxDestinationMobile.addEventListener("keyup", function (e) {
+      vm.onSearch2(e.target.value);
+    });
+
+    vm.btnAddRoom.onclick = () => {
+      vm.data.paxes.push({
+        adults: 1,
+        children: [],
+      });
+
+      vm.renderPaxes();
+    };
+
+    vm.btnApplyRoom.onclick = () => {
+      if (vm.isValidPax()) {
+        vm.paxesDropdown.classList.add("b-d-none");
+      }
+    };
+
+    vm.paxesBox.onclick = () => {
+      vm.paxesDropdown.classList.remove("b-d-none");
+    };
+
+    vm.searchBtn.onclick = () => {
+      if (!vm.validateBooker()) {
+        return;
+      }
+
+      let path = config.pathPackage;
+      let form = document.createElement("form");
+      let paxesData = MapPaxToUrl(vm.data.paxes);
+
+      let data = {
+        startingFromDateTime: formatDate(vm.data.checkIn, config.formatDate),
+        returningFromDateTime: formatDate(vm.data.checkOut, config.formatDate),
+        CheckIn: formatDate(vm.data.checkIn, config.formatDate),
+        CheckOut: formatDate(vm.data.checkOut, config.formatDate),
+        startingFromAirport: vm.data.place_selected.placeCode,
+        returningFromAirport: vm.data.place_selected_to.placeCode,
+        startingPlaceId: vm.data.place_selected.placeId,
+        returningPlaceId: vm.data.place_selected_to.placeId,
+        URI: vm.data.place_selected_to.placeUri,
+      };
+
+      data = { ...data, ...paxesData, ...valuesDefaultsF };
+
+      form.setAttribute("method", "get");
+      form.setAttribute("action", `${config.siteUrl}${path}`);
+
+      for (var key in data) {
+        if (data[key]) {
+          var hiddenField = document.createElement("input");
+          hiddenField.setAttribute("type", "hidden");
+          hiddenField.setAttribute("name", key);
+          hiddenField.setAttribute("value", data[key]);
+
+          form.appendChild(hiddenField);
+        }
+      }
+
+      document.body.appendChild(form);
+
+      form.submit();
+    };
+
+    vm.closeBtn.onclick = () => vm.hideModal();
+    vm.closeBtn2.onclick = () => vm.hideModal2();
+
+    vm.pickerPackage = new Lightpick({
+      field: GetById("datepicker5"),
+      secondField: GetById("datepicker6"),
+      repick: false,
+      singleDate: false,
+      numberOfMonths: 2,
+      numberOfColumns: 2,
+      tooltipNights: true,
+      hoveringTooltip: true,
+      startDate: vm.data.checkIn,
+      endDate: vm.data.checkOut,
+      minDate: new Date(),
+      minDays: 2,
+      locale: {
+        tooltip: {
+          one: "noche",
+          other: "noches",
+        },
+      },
+      lang: "es",
+      format: "ddd D MMM YYYY",
+      onSelect: function (start, end) {
+        if (start && end) {
+          vm.data["checkIn"] = start.toDate();
+          vm.data["checkOut"] = end.toDate();
+          GetById("datepicker2").classList.remove("has-danger");
+          vm.removeErrorMsg("backErrorPackage");
+        }
+      },
+    });
+  }
+
+  vm.hideModal = function () {
+    vm.modalSuggest.classList.add("hide");
+    vm.modalSuggest.classList.remove("show");
+  };
+
+  vm.hideModal2 = function () {
+    vm.modalSuggest2.classList.add("hide");
+    vm.modalSuggest2.classList.remove("show");
+  };
+
+  vm.onSearch = (value) => {
+    if (!value || (value && value.length < 3)) {
+      vm.boxList.innerHTML = "";
+      return;
+    }
+
+    const params = {
+      query: value,
+      language: "es-mx",
+      placeTypes:"3,6,7,12",
+      usersearch: "ifsiy6slswes",
+      size:10,
+    };
+
+    $get2(config.urlPackages, params)
+      .then((data) => {
+        if (data && data.length) {
+          vm.boxList.innerHTML = "";
+          data.map((suggestion) => {
+            let btn = document.createElement("button");
+            btn.type = "button";
+            btn.className =
+              "list-group-item list-group-item-action list-group-item-hover";
+                  //codigo alonso
+
+                  btn.innerHTML = `
+                  <span class="autocomplete-item">
+                    <span class="autocomplete-option">
+                      <span class="autocomplete-box">
+                      
+                        <span class="autocomplete-name-data-algolia pl-1">
+                        <span>
+                            ${suggestion.placeDescriptionHtml}
+                          </span>
+                          ${
+                            suggestion.placeTypeIcon != 18 && suggestion.placeCode && suggestion.placeCode.length > 0 ?
+                            "<small>("+suggestion.placeCode+")</small>" : ""
+                          }
+                          <br />
+                          ${
+                            suggestion.placeTypeIcon == 18 ?
+                            "<small>Todos los aeropuertos, </small>" : ""
+                          }
+                          <small>
+                            ${suggestion.placeName}
+                          </small>
+                        </span>
+                      </span>
+                    </span>
+                  </span>
+                `;                  
+                  //fin codigo alonso
+
+            btn.onclick = function () {
+              vm.searchBoxOrigin.value = suggestion.placeDescription;
+              vm.searchBoxOriginMobile.value = suggestion.placeDescription;
+              vm.placeData = suggestion;
+              vm.data.place_name = suggestion.placeDescription;
+              vm.data.place_selected = suggestion;
+              vm.hideModal();
+              vm.searchBoxOrigin.classList.remove("has-danger");
+              vm.removeErrorMsg("inputPackageError");
+            };
+
+            vm.boxList.appendChild(btn);
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  vm.onSearch2 = (value) => {
+    if (!value || (value && value.length < 3)) {
+      vm.boxList2.innerHTML = "";
+      return;
+    }
+
+    const params = {
+      query: value,
+      language: "es-mx",
+      placeTypes: "3,6,7,12",
+      usersearch: "ifsiy6slswes",
+      size:10,
+    };
+
+    $get2(config.urlPackages, params)
+      .then((data) => {
+        if (data && data.length) {
+          vm.boxList2.innerHTML = "";
+          data.map((suggestion) => {
+            let btn = document.createElement("button");
+            btn.type = "button";
+            btn.className =
+              "list-group-item list-group-item-action list-group-item-hover";
+                  //codigo alonso
+                  btn.innerHTML = `
+                  <span class="autocomplete-item">
+                    <span class="autocomplete-option">
+                      <span class="autocomplete-box">
+                        <span class="autocomplete-name-data-algolia pl-1">
+                          <span>
+                            ${suggestion.placeDescriptionHtml}
+                          </span>
+                          ${
+                            suggestion.placeTypeIcon != 18 && suggestion.placeCode && suggestion.placeCode.length > 0 ?
+                            "<small>("+suggestion.placeCode+")</small>" : ""
+                          }
+                          <br />
+                          ${
+                            suggestion.placeTypeIcon == 18 ?
+                            "<small>Todos los aeropuertos, </small>" : ""
+                          }
+                          <small>
+                            ${suggestion.placeName}
+                          </small>
+                        </span>
+                      </span>
+                    </span>
+                  </span>
+                `;                  
+                  
+                  //fin codigo alonso
+
+            btn.onclick = function () {
+              vm.searchBoxDestination.value = suggestion.placeDescription;
+              vm.searchBoxDestinationMobile.value = suggestion.placeDescription;
+              vm.placeData_to = suggestion;
+              vm.data.place_name_to = suggestion.placeDescription;
+              vm.data.place_selected_to = suggestion;
+              vm.hideModal2();
+              vm.searchBoxDestination.classList.remove("has-danger");
+              vm.removeErrorMsg("inputPackageError_to");
+            };
+
+            vm.boxList2.appendChild(btn);
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  vm.renderPaxes = () => {
+    vm.paxesModal.innerHTML = "";
+    vm.data.paxes.map((item, index) => {
+      const template = `
+            <div id="cRomm01" class="bpt-d-int">
+            <label class="b-w-100 b-c-title b-d-header">
+              <span>Habitación ${index + 1}</span>
+              <span id="closeDropdownPackage${
+                index + 1
+              }" onclick="bookerP.removeRoom(event,${index})" class="b-simple-icon material-icons">close</span>
+            </label>
+    
+            <div class="b-row b-mb-3">
+              <div class="b-col-6">Adultos</div>
+              <div class="b-col-2 b-p-0 ">
+                <div class="b-btn-circle" onclick="bookerP.removeAdult(event,${index})">
+                  <span class="b-simple-icon material-icons">remove</span>
+                </div>
+              </div>
+              <div class="b-col-2 b-p-0">
+                <span class="b-result">${item.adults}</span>
+              </div>
+              <div class="b-col-2 b-p-0 ">
+                <div class="b-btn-circle" onclick="bookerP.addAdult(event,${index})">
+                  <span class="b-simple-icon material-icons">add</span>
+                </div>
+              </div>
+            </div>
+    
+            <div class="b-row b-mb-3">
+              <div class="b-col-6">Menores</div>
+              <div class="b-col-2 b-p-0 ">
+                <div class="b-btn-circle" onclick="bookerP.removeChild(event,${index})">
+                  <span class="b-simple-icon material-icons">remove</span>
+                </div>
+              </div>
+              <div class="b-col-2 b-p-0">
+                <span class="b-result">${item.children.length}</span>
+              </div>
+              <div class="b-col-2 b-p-0 ">
+                <div id="openMinorPackage1" class="b-btn-circle" onclick="bookerP.addChild(event,${index})">
+                  <span class="b-simple-icon material-icons">add</span>
+                </div>
+              </div>
+
+              <div id="cBoxMinorPackage1" class=" b-c-minor b-w-100 ${
+                item.children.length ? "" : "b-d-none"
+              }">
+    
+                <div class="b-row">
+                  <div class="b-col-12">
+                    <label class="b-mt-3 b-d-block">¿Cuál es su edad? * <small>(Hasta 17 años)</small></label>
+                  </div>
+                </div>
+    
+                <div class="b-row">
+
+                ${item.children
+                  .map((child, ind) => {
+                    return `
+                    <div class="b-col-12">
+                        <div class="b-form-group" id="parentAgePackageR${
+                          index + 1
+                        }C${ind + 1}">
+                        <div class="b-row">
+                        <div class="b-col-6" style="padding: 5px 2px 2px 16px;">
+                        <label for="exampleFormControlSelect1">Edad menor ${
+                          ind + 1
+                        }</label>
+                        </div>
+                        <div class="b-col-6">
+                        <select class="b-form-control" id="ageFormSelectR${
+                          index + 1
+                        }C${ind + 1}" name="childrenAgeR${index + 1}C${
+                      ind + 1
+                    }" onchange="bookerP.setAgeChild(event, ${index}, ${ind})" required>
+                            <option value="">Edad</option>
+                            ${vm.getListAges(child.years)}
+                        </select>
+                        </div>
+                        </div>
+                        </div>
+                    </div>
+                    `;
+                  })
+                  .join("")}
+                  
+                  
+                </div>
+    
+              </div>
+            </div>
+          </div>
+          <div class="b-row">
+                  <div class="b-col-12 b-hr"></div>
+                </div>
+            `;
+
+      vm.paxesModal.innerHTML += template;
+    });
+
+    vm.paxesBox.value = vm.getPaxInputString();
+  };
+
+  vm.getPaxInputString = () => {
+    const totalAdults = vm.data.paxes.reduce(
+      (prev, current) => prev + current.adults,
+      0
+    );
+    const totalKids = vm.data.paxes.reduce(
+      (prev, current) => prev + current.children.length,
+      0
+    );
+
+    return `${totalAdults} Adulto${totalAdults === 1 ? "" : "s"}${
+      totalKids
+        ? ", " + totalKids + " Menor" + (totalKids === 1 ? "" : "es")
+        : ""
+    }`;
+  };
+
+  vm.getListAges = (year) => {
+    let str = ``;
+    for (
+      let a = config.settingPaxes.minAge;
+      a < config.settingPaxes.maxAge + 1;
+      a++
+    ) {
+    if(a>0){
+      if(a==1){
+        str += `<option value="${a}" ${
+          year && +year === a && year ? "selected" : ""
+        }>0 a 23 Meses</option>`;
+  
+      }else{
+      str += `<option value="${a}" ${
+        year && +year === a && year ? "selected" : ""
+      }>${a} años</option>`;
+    }
+    }
+    }
+
+    return str;
+  };
+
+  vm.removeRoom = (e, index) => {
+    e.stopPropagation();
+    if (index === 0) {
+      if (vm.isValidPax()) vm.paxesDropdown.classList.add("b-d-none");
+      return;
+    }
+    vm.data.paxes.splice(index, 1);
+    vm.renderPaxes();
+  };
+
+  vm.addAdult = (e, index) => {
+    e.stopPropagation();
+    if (vm.data.paxes[index].adults < config.settingPaxes.maxAdults) {
+      vm.data.paxes[index].adults += 1;
+      vm.renderPaxes();
+    }
+  };
+
+  vm.removeAdult = (e, index) => {
+    e.stopPropagation();
+    if (vm.data.paxes[index].adults > 1) {
+      vm.data.paxes[index].adults -= 1;
+      vm.renderPaxes();
+    }
+  };
+
+  vm.addChild = (e, index) => {
+    e.stopPropagation();
+    if (vm.data.paxes[index].children.length < config.settingPaxes.maxChildren)
+      vm.data.paxes[index].children.push({ years: null });
+    vm.renderPaxes();
+  };
+
+  vm.removeChild = (e, index) => {
+    e.stopPropagation();
+    vm.data.paxes[index].children.pop();
+    vm.renderPaxes();
+  };
+
+  vm.setAgeChild = (evt, room, child) => {
+    vm.data.paxes[room].children[child].years = evt.target.value;
+
+    vm.removeErrorMsg(`errorChildPackageR${room + 1}C${child + 1}`);
+    GetById(`ageFormSelectR${room + 1}C${child + 1}`).classList.remove(
+      "is-invalid"
+    );
+  };
+
+  vm.validateBooker = () => {
+    let valid = true;
+    if (!vm.data.place_selected) {
+      vm.searchBoxOrigin.classList.add("has-danger");
+      vm.addMessageError(
+        "bformPackage",
+        "Selecciona tu origen",
+        "inputPackageError"
+      );
+
+      valid = false;
+    }
+
+    if (!vm.data.place_selected_to) {
+      vm.searchBoxDestination.classList.add("has-danger");
+      vm.addMessageError(
+        "bformPackage_to",
+        "Selecciona tu destino",
+        "inputPackageError_to"
+      );
+
+      valid = false;
+    }
+
+    if (!vm.isValidDate(vm.data.checkIn, vm.data.checkOut)) {
+      valid = false;
+    }
+
+    if (!vm.isValidPax()) {
+      setTimeout(() => {
+        vm.paxesDropdown.classList.remove("b-d-none");
+      }, 200);
+      valid = false;
+    }
+
+    return valid;
+  };
+
+  vm.addMessageError = (container, message, id) => {
+    if (GetById(id)) {
+      return;
+    }
+
+    let msg = document.createElement("div");
+    msg.className = "invalid-feedback";
+    msg.id = id;
+    msg.innerText = message;
+    GetById(container).appendChild(msg);
+  };
+
+  vm.removeErrorMsg = (msgId) => {
+    let element = GetById(msgId);
+    if (element) {
+      element.remove();
+    }
+  };
+
+  vm.isValidPax = () => {
+    let valid = true;
+    let rooms = vm.data.paxes.length;
+
+    for (let i = 0; i < rooms; i++) {
+      const room = vm.data.paxes[i];
+
+      let childrens = room.children.length;
+      for (let c = 0; c < childrens; c++) {
+        let inputKid = GetById(`ageFormSelectR${i + 1}C${c + 1}`);
+        if (inputKid.value === "") {
+          inputKid.classList.add("is-invalid");
+          vm.addMessageError(
+            `parentAgePackageR${i + 1}C${c + 1}`,
+            "Elige su edad",
+            `errorChildPackageR${i + 1}C${c + 1}`
+          );
+          valid = false;
+        }
+      }
+    }
+
+    return valid;
+  };
+
+  vm.isValidDate = (dateFrom, dateTo) => {
+    let valid = true;
+
+    dateFrom.setHours(0, 0, 0, 0);
+    dateTo.setHours(0, 0, 0, 0);
+
+    if (+dateFrom > +dateTo) {
+      GetById("datepicker4").classList.add("has-danger");
+      vm.addMessageError(
+        "parentBackPackage",
+        "Elige tu fecha de regreso",
+        "backErrorPackage"
+      );
+      valid = false;
+    }
+
+    return valid;
+  };
+
+  function getInitialPlaces() {
+    let placesString = config.placesTypePackages;
+    if (placesString) {
+      placesString = placesString.split(",");
+      for (let i = 0; i < placesString.length; i++) {
+        _placesTypes[`placeTypes[${i}]`] = placesString[i];
+      }
+    }
+  }
+
+  init();
+
+  return vm;
+}
+
+//paquetes
+var bookerP = BookerP("place_name_package_o", "place_name_package_d");
